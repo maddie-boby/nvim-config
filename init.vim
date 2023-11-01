@@ -20,58 +20,75 @@ filetype plugin on
 set cursorline              " highlight current cursorline
 set ttyfast                 " Speed up scrolling in Vim
 " set spell                 " enable spell check (may need to download language package)
-" set noswapfile            " disable creating swap file
-" set backupdir=~/.cache/vim " Directory to store backup files.
+set termguicolors
 
-" vim-plug packages
+lua << EOF
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+EOF
+
 call plug#begin()
-Plug 'EdenEast/nightfox.nvim'
-Plug 'freddiehaddad/feline.nvim'
+
+Plug 'tpope/vim-sensible'
+" Visual stuff
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim', {'branch': '0.1.x'}
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+Plug 'nvim-lualine/lualine.nvim'
+" If you want to have icons in your statusline choose one of these
+Plug 'EdenEast/nightfox.nvim' 
 Plug 'nvim-tree/nvim-web-devicons'
+Plug 'nvim-tree/nvim-tree.lua'
+
+" LSP
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'williamboman/mason.nvim', {'do': ':MasonUpdate'}
+
+Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
 Plug 'neovim/nvim-lspconfig'
+
+" Rust
 Plug 'simrat39/rust-tools.nvim'
-Plug 'nvim-lua/popup.nvim'
+
+" Rust Debugging
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+Plug 'mfussenegger/nvim-dap'
 
-
-" main one
+" coq
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
 " 9000+ Snippets
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
 " lua & third party sources -- See https://github.com/ms-jpq/coq.thirdparty
 " Need to **configure separately**
 Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+
 call plug#end()
 
-colorscheme nightfox
-lua require('feline').setup()
+lua require('mason').setup()
+lua require('mason-lspconfig').setup()
+lua require('lspconfig').clangd.setup({})
+lua require('lspconfig').pyright.setup({})
+"lua require('lspconfig')['perl-debug-adapter'].setup({})
+lua require('lspconfig').perlnavigator.setup({})
+lua require('lspconfig').intelephense.setup({})
+lua require('lspconfig').ruby_ls.setup({})
+lua require('lspconfig').gopls.setup({})
 
-lua << END
-local opts = {
-    tools = {
-        runnables = {
-            use_telescope = true,
-        },
-        inlay_hints = {
-            auto = true,
-            show_parameter_hints = false,
-            parameter_hints_prefix = "",
-            other_hints_prefix = "",
-        },
-    }
+lua require('rust-tools').setup()
+" init coq
+lua << EOF
+vim.g.coq_settings = {
+  auto_start = 'shut-up'
 }
-require('rust-tools').setup(opts)
-END
 
-lua require("mason").setup()
-lua require("mason-lspconfig").setup()
+local coq = require("coq")
+EOF
 
-lua require'lspconfig'.pyright.setup{}
-lua require('lspconfig').rust_analyzer.setup{}
+lua require('lualine').setup()
 
-let g:coq_settings = { 'auto_start': 'shut-up' }
-lua require('coq')
+lua require('nvim-tree').setup()
+
+lua require('telescope').setup()
+lua require('telescope').load_extension('fzf')
+
+colorscheme nightfox
