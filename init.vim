@@ -19,6 +19,7 @@ set clipboard=unnamedplus   " using system clipboard
 filetype plugin on
 set cursorline              " highlight current cursorline
 set ttyfast                 " Speed up scrolling in Vim
+set list
 " set spell                 " enable spell check (may need to download language package)
 set termguicolors
 
@@ -68,20 +69,20 @@ lua require('mason').setup()
 lua require('mason-lspconfig').setup()
 lua require('lspconfig').clangd.setup({})
 lua require('lspconfig').pyright.setup({})
-"lua require('lspconfig')['perl-debug-adapter'].setup({})
 lua require('lspconfig').perlnavigator.setup({})
 lua require('lspconfig').intelephense.setup({})
 lua require('lspconfig').ruby_ls.setup({})
 lua require('lspconfig').gopls.setup({})
+lua require('lspconfig').tsserver.setup({})
 
 lua require('rust-tools').setup()
+
 " init coq
 lua << EOF
 vim.g.coq_settings = {
-  auto_start = 'shut-up'
+    auto_start = 'shut-up'
 }
-
-local coq = require("coq")
+local coq = require('coq')
 EOF
 
 lua require('lualine').setup()
@@ -90,5 +91,9 @@ lua require('nvim-tree').setup()
 
 lua require('telescope').setup()
 lua require('telescope').load_extension('fzf')
+
+autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType html setlocal shiftwidth=2 tabstop=2
+autocmd FileType cpp setlocal shiftwidth=4 tabstop=4 noexpandtab
 
 colorscheme nightfox
